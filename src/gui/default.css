@@ -336,3 +336,20 @@ Map view feature
     -fx-background-color: -cc-accent-color;
 }
 
+/*
+Tool bar
+*/
+
+#toolBar {
+    -fx-background-color: -cc-background-color;
+}
+
+.toolButton {
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+    -fx-max-width: 60px;
+    -fx-max-height: 60px;
+
+    -fx-padding: 15px;
+    -fx-background-insets: 5px;
+}
