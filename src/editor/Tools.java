@@ -1,29 +1,34 @@
 package editor;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public enum Tools {
+    NONE,
+
     ADD_NODE,
-    MOVE_NODE,
     REMOVE_NODE,
+    MOVE_NODE,
 
     ADD_PATH,
     REMOVE_PATH,
     MOVE_PATH_CENTER,
 
     ADD_JUNCTION,
-    REMOVE_JUCTION,
-    MOVE_JUNCTION,
+    REMOVE_JUNCTION,
+    MOVE_JUNCTION;
 
-    NONE;
+    private final static double ICON_SIZE = 40;
 
-    public Image getIcon() {
+    public ImageView getIcon() {
         return Tools.getIcon(this);
     }
 
-    public static Image getIcon(Tools t) {
-        if (t == Tools.NONE)
-            return null;
-        return new Image("resources/" + t.name() + ".png");
+    public static ImageView getIcon(Tools t) {
+        String path = "resources/" + t.name() + ".png";
+
+        ImageView im = new ImageView(new Image(path, ICON_SIZE, ICON_SIZE, true, true));
+
+        return im;
     }
 }
