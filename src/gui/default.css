@@ -336,6 +336,10 @@ Map view feature
     -fx-background-color: -cc-accent-color;
 }
 
+.mapHandle {
+    -fx-fill: -cc-accent-color !important;
+}
+
 /*
 Tool bar
 */

@@ -18,12 +18,17 @@ import map.Position;
  * @author Henrik Nilsson
  */
 public class MapViewFeatureController implements UpdateListener<Map> {
-    private static final double NODE_DOT_SIZE = 10;
+    private static final double NODE_DOT_SIZE = 15;
+    private static final double HANDLE_DOT_SIZE = 10;
 
     @FXML private Pane mapViewFeature;
-    @FXML private Group mapViewTopLayer;
-    @FXML private Group mapViewMiddleLayer;
-    @FXML private Group mapViewBottomLayer;
+    @FXML private Group mapViewNodeLayer;
+    @FXML private Group mapViewPathLayer;
+    @FXML private Group mapViewJunctionLayer;
+
+    @FXML private Group mapViewNodeHandles;
+    @FXML private Group mapViewPathHandles;
+    @FXML private Group mapViewJunctionHandles;
 
     public void initialize() {
         Editor.getInstance().map.subscribe(this);
@@ -52,20 +57,55 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             // Add node dot
             Position startPos = repositionPoint(n.getPosition(), width, height, mapCenterMass, scaleFactor);
 
+            // Add node
             Circle fxNodeDot = new Circle(startPos.x, startPos.y, NODE_DOT_SIZE);
             fxNodeDot.getStyleClass().add("mapNodeDot");
-            fxNodeDot.idProperty().setValue("mapNodeDot" + n.getIndex(map));
-            mapViewTopLayer.getChildren().add(fxNodeDot);
+            fxNodeDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
+            mapViewNodeLayer.getChildren().add(fxNodeDot);
 
-            for (Connection c : n.getNeighbors()) {
-                Position midPos = repositionPoint(c.getMidPoint(), width, height, mapCenterMass, scaleFactor);
-                Position endPos = repositionPoint(c.getConnectingNode().getPosition(), width, height, mapCenterMass, scaleFactor);
+            if (n.getNeighbors().size() <= 2) {
+                // Add node handle
+                Circle fxNodeHandleDot = new Circle(startPos.x, startPos.y, HANDLE_DOT_SIZE);
+                fxNodeHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
+                fxNodeHandleDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
+                mapViewNodeHandles.getChildren().add(fxNodeHandleDot);
 
-                QuadCurve fxPathLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
-                fxPathLine.getStyleClass().add("mapPathLine");
-                fxPathLine.idProperty().setValue("mapPathLine" + n.getIndex(map) + ":" + c.getConnectingNode().getIndex(map));
-                mapViewBottomLayer.getChildren().add(fxPathLine);
+
+                for (Connection c : n.getNeighbors()) {
+                    Position midPos = repositionPoint(c.getMidPoint(), width, height, mapCenterMass, scaleFactor);
+                    Position endPos = repositionPoint(c.getConnectingNode().getPosition(), width, height, mapCenterMass, scaleFactor);
+
+                    // Add path
+                    QuadCurve fxPathLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
+                    fxPathLine.getStyleClass().add("mapPathLine");
+                    fxPathLine.idProperty().setValue("mapPathLine" + n.getIndex(map) + ":" + c.getConnectingNode().getIndex(map));
+                    mapViewPathLayer.getChildren().add(fxPathLine);
+
+                    // Add path handle
+
+                    Circle fxPathHandleDot = new Circle(midPos.x, midPos.y, HANDLE_DOT_SIZE);
+                    fxPathHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
+                    fxPathHandleDot.idProperty().setValue(n.getIndex(map) + ":" + c.getConnectingNode().getIndex(map));
+                    mapViewPathHandles.getChildren().add(fxPathHandleDot);
+                }
             }
+            else {
+                // Add junction handle
+                Node junc1 = n;
+                Node junc2 = n.getNeighbors().get(0).getConnectingNode();
+                Node junc3 = n.getNeighbors().get(1).getConnectingNode();
+
+                Position juncPos = new Position(startPos);
+                juncPos.add(junc2.getPosition());
+                juncPos.add(junc3.getPosition());
+                juncPos.divide(3);
+
+                Circle fxJunctionHandleDot = new Circle(juncPos.x, juncPos.y, HANDLE_DOT_SIZE);
+                fxJunctionHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
+                fxJunctionHandleDot.idProperty().setValue(junc1.getIndex(map) + ":" + junc2.getIndex(map) + ":" + junc3.getIndex(map));
+                mapViewJunctionHandles.getChildren().add(fxJunctionHandleDot);
+            }
+
         }
     }
 
