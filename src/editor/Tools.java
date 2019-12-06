@@ -31,4 +31,40 @@ public enum Tools {
 
         return im;
     }
+
+    public enum ToolType {
+        NONE,
+        NODE,
+        PATH,
+        JUNCTION;
+    }
+
+    public ToolType getType() {
+        return Tools.getType(this);
+    }
+
+    private static ToolType getType(Tools t) {
+        switch (t) {
+            case NONE:
+                return ToolType.NONE;
+
+            case ADD_NODE:
+            case REMOVE_NODE:
+            case MOVE_NODE:
+                return ToolType.NODE;
+
+            case ADD_PATH:
+            case REMOVE_PATH:
+            case MOVE_PATH_CENTER:
+                return ToolType.PATH;
+
+            case ADD_JUNCTION:
+            case REMOVE_JUNCTION:
+            case MOVE_JUNCTION:
+                return ToolType.JUNCTION;
+
+            default:
+                throw new IllegalStateException("Unexpected value: " + t);
+        }
+    }
 }
