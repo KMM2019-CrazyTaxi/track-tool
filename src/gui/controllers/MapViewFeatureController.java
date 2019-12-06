@@ -1,5 +1,6 @@
 package gui.controllers;
 
+import helpers.UpdateListener;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
@@ -9,19 +10,24 @@ import map.Connection;
 import map.Map;
 import map.Node;
 import map.Position;
+import main.CTPanel;
 
 /**
  * Map View-feature controller. This is the main controller class for the Map View-feature.
  *
  * @author Henrik Nilsson
  */
-public class MapViewFeatureController {
+public class MapViewFeatureController implements UpdateListener<Map> {
     private static final double NODE_DOT_SIZE = 10;
 
     @FXML private Pane mapViewFeature;
     @FXML private Group mapViewTopLayer;
     @FXML private Group mapViewMiddleLayer;
     @FXML private Group mapViewBottomLayer;
+
+    public void initialize() {
+        CTPanel.getInstance().map.subscribe(this);
+    }
 
     /**
      * Update the shown map.
