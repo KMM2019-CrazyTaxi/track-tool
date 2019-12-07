@@ -31,6 +31,10 @@ public class Node {
         }
     }
 
+    public void removeNeighbor(Connection c) {
+        neighbors.remove(c);
+    }
+
     public List<Connection> getNeighbors() {
         return Collections.unmodifiableList(neighbors);
     }
@@ -55,7 +59,7 @@ public class Node {
         int offset = 1;
         for (Connection c : neighbors) {
             int connectionSize = c.byteSize();
-            System.arraycopy(c.toBytes(map), 0, bytes, offset, connectionSize);
+            System.arraycopy(c.toBytes(map, this), 0, bytes, offset, connectionSize);
             offset += connectionSize;
         }
 

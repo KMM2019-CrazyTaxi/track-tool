@@ -36,7 +36,7 @@ public enum Tools {
         NONE,
         NODE,
         PATH,
-        JUNCTION;
+        JUNCITON;
     }
 
     public ToolType getType() {
@@ -61,7 +61,7 @@ public enum Tools {
             case ADD_JUNCTION:
             case REMOVE_JUNCTION:
             case MOVE_JUNCTION:
-                return ToolType.JUNCTION;
+                return ToolType.JUNCITON;
 
             default:
                 throw new IllegalStateException("Unexpected value: " + t);

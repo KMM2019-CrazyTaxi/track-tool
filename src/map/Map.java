@@ -62,4 +62,21 @@ public class Map {
             throw new IllegalArgumentException("Given index is out of range (" + index + ").");
         return nodes.get(index);
     }
+
+    public void removeNode(Node node) {
+        for (Connection c : node.getNeighbors()) {
+            Node n = c.getConnectingNode(node);
+            n.removeNeighbor(c);
+        }
+        nodes.remove(node);
+    }
+
+    public Connection getConnection(Node node1, Node node2) {
+        for (Connection c : node1.getNeighbors()) {
+            if (c.getConnectingNode(node1) == node2) {
+                return c;
+            }
+        }
+        return null;
+    }
 }

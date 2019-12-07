@@ -66,4 +66,8 @@ public class UpdateWrapper<T> implements UpdateListener<T> {
             o.update(data);
         }
     }
+
+    synchronized public void noteChange() {
+        notifyListers(this.data);
+    }
 }

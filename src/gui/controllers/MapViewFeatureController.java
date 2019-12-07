@@ -47,6 +47,14 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param map Map data
      */
     private void redraw(Map map) {
+        mapViewNodeLayer.getChildren().clear();
+        mapViewPathLayer.getChildren().clear();
+        mapViewJunctionLayer.getChildren().clear();
+
+        mapViewNodeHandles.getChildren().clear();
+        mapViewPathHandles.getChildren().clear();
+        mapViewJunctionHandles.getChildren().clear();
+
         double width = mapViewFeature.getWidth();
         double height = mapViewFeature.getHeight();
 
@@ -73,27 +81,27 @@ public class MapViewFeatureController implements UpdateListener<Map> {
 
                 for (Connection c : n.getNeighbors()) {
                     Position midPos = repositionPoint(c.getMidPoint(), width, height, mapCenterMass, scaleFactor);
-                    Position endPos = repositionPoint(c.getConnectingNode().getPosition(), width, height, mapCenterMass, scaleFactor);
+                    Position endPos = repositionPoint(c.getConnectingNode(n).getPosition(), width, height, mapCenterMass, scaleFactor);
 
                     // Add path
                     QuadCurve fxPathLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
                     fxPathLine.getStyleClass().add("mapPathLine");
-                    fxPathLine.idProperty().setValue("mapPathLine" + n.getIndex(map) + ":" + c.getConnectingNode().getIndex(map));
+                    fxPathLine.idProperty().setValue("mapPathLine" + n.getIndex(map) + ":" + c.getConnectingNode(n).getIndex(map));
                     mapViewPathLayer.getChildren().add(fxPathLine);
 
                     // Add path handle
 
                     Circle fxPathHandleDot = new Circle(midPos.x, midPos.y, HANDLE_DOT_SIZE);
                     fxPathHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
-                    fxPathHandleDot.idProperty().setValue(n.getIndex(map) + ":" + c.getConnectingNode().getIndex(map));
+                    fxPathHandleDot.idProperty().setValue(n.getIndex(map) + ":" + c.getConnectingNode(n).getIndex(map));
                     mapViewPathHandles.getChildren().add(fxPathHandleDot);
                 }
             }
             else {
                 // Add junction handle
                 Node junc1 = n;
-                Node junc2 = n.getNeighbors().get(0).getConnectingNode();
-                Node junc3 = n.getNeighbors().get(1).getConnectingNode();
+                Node junc2 = n.getNeighbors().get(0).getConnectingNode(n);
+                Node junc3 = n.getNeighbors().get(1).getConnectingNode(n);
 
                 Position juncPos = new Position(startPos);
                 juncPos.add(junc2.getPosition());
@@ -110,6 +118,25 @@ public class MapViewFeatureController implements UpdateListener<Map> {
     }
 
     /**
+     * Reposition the given viewport point to correspond to the map coordinate.
+     * @param p Viewport position
+     * @param width Width of view
+     * @param height Height of view
+     * @param offset Center mass offset from (0,0)
+     * @param scale Scale factor
+     * @return New repositioned position
+     */
+    public static Position unpositionPoint(Position p, double width, double height, Position offset, double scale) {
+        Position newPos = new Position(p);
+
+        newPos.subtract(new Position(width / 2, height / 2));
+        newPos.divide(scale);
+        newPos.add(offset);
+
+        return newPos;
+    }
+
+    /**
      * Reposition the given point to correspond to the viewport.
      * @param p Base position
      * @param width Width of view
@@ -118,7 +145,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param scale Scale factor
      * @return New repositioned position
      */
-    private static Position repositionPoint(Position p, double width, double height, Position offset, double scale) {
+    public static Position repositionPoint(Position p, double width, double height, Position offset, double scale) {
         Position newPos = new Position(p);
 
         newPos.subtract(offset);
@@ -136,7 +163,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param mid Map center mass
      * @return Rescale factor to fit the view
      */
-    private static double calculateScaleFactor(Map map, double width, double height, Position mid) {
+    public static double calculateScaleFactor(Map map, double width, double height, Position mid) {
         return Math.min(calculateScaleFactorX(map, width, mid.x), calculateScaleFactorY(map, height, mid.y));
     }
 
@@ -147,7 +174,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param mid Map center mass
      * @return Rescale factor to fit the width of view
      */
-    private static double calculateScaleFactorX(Map map, double width, double mid) {
+    public static double calculateScaleFactorX(Map map, double width, double mid) {
         double min = mid;
         double max = mid;
 
@@ -182,7 +209,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param mid Map center mass
      * @return Rescale factor to fit the width of view
      */
-    private static double calculateScaleFactorY(Map map, double height, double mid) {
+    public static double calculateScaleFactorY(Map map, double height, double mid) {
         double min = mid;
         double max = mid;
 
@@ -215,7 +242,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param map Map data
      * @return Position of map center mass
      */
-    private static Position calculateCenterMass(Map map) {
+    public static Position calculateCenterMass(Map map) {
         Position offset = new Position();
         int numberOfPositions = 0;
 

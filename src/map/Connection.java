@@ -6,15 +6,17 @@ public class Connection {
     // Byte size as per definition in connection protocol
     private final static int BYTE_SIZE = 5;
 
-    private Node connectingNode;
+    private Node node1;
+    private Node node2;
     private Direction direction;
     private int distance;
     private boolean stopable;
 
     private Position midPoint;
 
-    public Connection(Node connectingNode, Direction direction, int distance, boolean stopable, Position midPoint) {
-        this.connectingNode = connectingNode;
+    public Connection(Node node1, Node node2, Direction direction, int distance, boolean stopable, Position midPoint) {
+        this.node1 = node1;
+        this.node2 = node2;
         this.direction = direction;
         this.distance = distance;
         this.stopable = stopable;
@@ -25,8 +27,10 @@ public class Connection {
         return BYTE_SIZE;
     }
 
-    public Node getConnectingNode() {
-        return connectingNode;
+    public Node getConnectingNode(Node self) {
+        if (self == node1)
+            return node2;
+        return node1;
     }
 
     public Direction getDirection() {
@@ -45,10 +49,10 @@ public class Connection {
         return midPoint;
     }
 
-    public byte[] toBytes(Map map) {
+    public byte[] toBytes(Map map, Node self) {
         byte[] bytes = new byte[this.byteSize()];
 
-        bytes[0] = DataConversionHelper.intToByteArray(connectingNode.getIndex(map), 1)[0];
+        bytes[0] = DataConversionHelper.intToByteArray(getConnectingNode(self).getIndex(map), 1)[0];
         bytes[1] = DataConversionHelper.intToByteArray(distance, 2)[0];
         bytes[2] = DataConversionHelper.intToByteArray(distance, 2)[1];
         bytes[3] = (byte) (stopable ? 1 : 0);
