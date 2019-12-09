@@ -340,6 +340,11 @@ Map view feature
     -fx-fill: -cc-accent-color !important;
 }
 
+.distanceText {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
 /*
 Tool bar
 */

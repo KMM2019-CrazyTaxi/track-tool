@@ -1,6 +1,7 @@
+<?import javafx.scene.*?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
 
-<?import javafx.scene.Group?>
 <Pane fx:id="mapViewFeature" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.MapViewFeatureController">
     <Group fx:id="mapViewJunctionLayer" />
     <Group fx:id="mapViewPathLayer" />
@@ -9,4 +10,7 @@
     <Group fx:id="mapViewJunctionHandles" />
     <Group fx:id="mapViewPathHandles" />
     <Group fx:id="mapViewNodeHandles" />
+    <Group fx:id="mapViewConnectHandles" />
+
+    <Circle visible="false" radius="10" disable="true" fx:id="dragGhost" styleClass="mapNodeDot, mapHandle" />
 </Pane>

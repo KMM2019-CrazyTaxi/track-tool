@@ -14,6 +14,21 @@ public class Connection {
 
     private Position midPoint;
 
+    public Connection(Node node1, Node node2, Direction direction, int distance, boolean stopable) {
+        this.node1 = node1;
+        this.node2 = node2;
+        this.direction = direction;
+        this.distance = distance;
+        this.stopable = stopable;
+
+        // Average the positions of connecting nodes
+        Position avg = new Position(node1.getPosition());
+        avg.add(node2.getPosition());
+        avg.divide(2);
+
+        this.midPoint = avg;
+    }
+
     public Connection(Node node1, Node node2, Direction direction, int distance, boolean stopable, Position midPoint) {
         this.node1 = node1;
         this.node2 = node2;
@@ -59,5 +74,13 @@ public class Connection {
         bytes[4] = direction.code();
 
         return bytes;
+    }
+
+    public void setMidPoint(Position newPos) {
+        this.midPoint = newPos;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 }

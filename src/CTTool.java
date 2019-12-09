@@ -24,10 +24,15 @@ public class CTTool extends Application {
         Node node2 = new Node(new Position(300, 100));
         Node node3 = new Node(new Position(300, 300));
 
-        node0.addNeighbor(new Connection(node0, node1, Direction.STRAIGHT, 100, false, new Position(50, 200)));
-        node1.addNeighbor(new Connection(node1, node3, Direction.STRAIGHT, 100, false, new Position(200, 300)));
-        node3.addNeighbor(new Connection(node3, node2, Direction.STRAIGHT, 100, false, new Position(350, 200)));
-        node2.addNeighbor(new Connection(node0, node2, Direction.STRAIGHT, 100, false, new Position(200, 100)));
+        Connection con0 = new Connection(node0, node1, Direction.STRAIGHT, 100, false, new Position(50, 200));
+        Connection con1 = new Connection(node1, node3, Direction.STRAIGHT, 100, false, new Position(200, 300));
+        Connection con2 = new Connection(node3, node2, Direction.STRAIGHT, 100, false, new Position(350, 200));
+        Connection con3 = new Connection(node0, node2, Direction.STRAIGHT, 100, false, new Position(200, 100));
+
+        node0.addAllNeighbors(con0, con3);
+        node1.addAllNeighbors(con0, con1);
+        node3.addAllNeighbors(con1, con2);
+        node2.addAllNeighbors(con2, con3);
 
         map.addNode(node0);
         map.addNode(node1);

@@ -3,7 +3,6 @@ package map;
 import helpers.DataConversionHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Node {
@@ -25,18 +24,18 @@ public class Node {
         neighbors.add(neighbor);
     }
 
-    public void addAllNeighbors(List<Connection> neighbors) {
+    public void addAllNeighbors(Connection... neighbors) {
         for (Connection c : neighbors) {
             addNeighbor(c);
         }
     }
 
     public void removeNeighbor(Connection c) {
-        neighbors.remove(c);
+        this.neighbors.remove(c);
     }
 
     public List<Connection> getNeighbors() {
-        return Collections.unmodifiableList(neighbors);
+        return neighbors;
     }
 
     public int getIndex(Map map) {
@@ -64,5 +63,9 @@ public class Node {
         }
 
         return bytes;
+    }
+
+    public void setPosition(Position newPos) {
+        this.position = newPos;
     }
 }

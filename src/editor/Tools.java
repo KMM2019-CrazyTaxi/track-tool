@@ -13,10 +13,13 @@ public enum Tools {
     ADD_PATH,
     REMOVE_PATH,
     MOVE_PATH_CENTER,
+    DISTANCE_PATH,
+    SPLIT_PATH,
 
     ADD_JUNCTION,
     REMOVE_JUNCTION,
-    MOVE_JUNCTION;
+    MOVE_JUNCTION,
+    ROTATE_JUNCTION;
 
     private final static double ICON_SIZE = 40;
 
@@ -36,7 +39,8 @@ public enum Tools {
         NONE,
         NODE,
         PATH,
-        JUNCITON;
+        JUNCITON,
+        CONNECT;
     }
 
     public ToolType getType() {
@@ -53,7 +57,8 @@ public enum Tools {
             case MOVE_NODE:
                 return ToolType.NODE;
 
-            case ADD_PATH:
+            case SPLIT_PATH:
+            case DISTANCE_PATH:
             case REMOVE_PATH:
             case MOVE_PATH_CENTER:
                 return ToolType.PATH;
@@ -61,7 +66,11 @@ public enum Tools {
             case ADD_JUNCTION:
             case REMOVE_JUNCTION:
             case MOVE_JUNCTION:
+            case ROTATE_JUNCTION:
                 return ToolType.JUNCITON;
+
+            case ADD_PATH:
+                return ToolType.CONNECT;
 
             default:
                 throw new IllegalStateException("Unexpected value: " + t);
