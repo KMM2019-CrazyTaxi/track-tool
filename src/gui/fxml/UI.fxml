@@ -7,7 +7,7 @@
 
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<Stage title="CC panel" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.UIController">
+<Stage title="CT Tool" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.UIController">
     <scene>
         <Scene fx:id="uiScene" width="800">
             <stylesheets>

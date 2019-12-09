@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import map.*;
 
-public class CTPanel extends Application {
+public class CTTool extends Application {
     public static void main(String[] args) {
         launch();
     }
