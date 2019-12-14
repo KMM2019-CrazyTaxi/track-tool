@@ -1,5 +1,7 @@
 package map;
 
+import helpers.DataConversionHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,21 +13,14 @@ public class Junction {
     private Node leftNode;
 
     private Position pos;
+    private double rotation;
 
     public Junction(Position pos) {
-        this.pos = pos;
+        this.rotation = 0;
 
-        Position posBottom = new Position(pos);
-        Position posRight = new Position(pos);
-        Position posLeft = new Position(pos);
-
-        posBottom.add(new Position(0, DISTANCE_OFFSET));
-        posRight.add(new Position(DISTANCE_OFFSET, 0));
-        posLeft.subtract(new Position(DISTANCE_OFFSET, 0));
-
-        bottomNode = new Node(posBottom);
-        rightNode = new Node(posRight);
-        leftNode = new Node(posLeft);
+        bottomNode = new Node(new Position());
+        rightNode = new Node(new Position());
+        leftNode = new Node(new Position());
 
         Connection botToRight = new Connection(bottomNode, rightNode, Direction.RIGHT, 0, false, pos);
         Connection rightToBot = new Connection(bottomNode, rightNode, Direction.LEFT, 0, false, pos);
@@ -44,6 +39,14 @@ public class Junction {
 
         leftNode.addNeighbor(leftToBot);
         leftNode.addNeighbor(leftToRight);
+
+        setPos(pos);
+    }
+
+    public Junction(Position pos, double rotation) {
+        this(pos);
+        this.rotation = rotation;
+        setPos(pos);
     }
 
     public Node getBottomNode() {
@@ -70,7 +73,7 @@ public class Junction {
         this.leftNode = leftNode;
     }
 
-    public Position getPos() {
+    public Position getPosition() {
         return pos;
     }
 
@@ -81,10 +84,14 @@ public class Junction {
         Position posRight = new Position(pos);
         Position posLeft = new Position(pos);
 
-        posBottom.add(new Position(0, DISTANCE_OFFSET));
-        posRight.add(new Position(DISTANCE_OFFSET, 0));
-        posLeft.subtract(new Position(DISTANCE_OFFSET, 0));
+        Position offset = new Position(0, DISTANCE_OFFSET);
+        offset.rotate(rotation);
 
+        posBottom.add(offset);
+
+        offset.rotate(Math.PI / 2);
+        posRight.subtract(offset);
+        posLeft.add(offset);
 
         bottomNode.setPosition(posBottom);
         leftNode.setPosition(posLeft);
@@ -93,6 +100,11 @@ public class Junction {
         for (Connection c : getInternalNeighbors()) {
             c.setMidPoint(pos);
         }
+    }
+
+    public void rotatePos(double rotation) {
+        this.rotation = rotation;
+        setPos(pos);
     }
 
     private List<Connection> getInternalNeighbors() {
@@ -158,5 +170,23 @@ public class Junction {
             default:
                 throw new IllegalArgumentException("Given index is out of range (" + index + ").");
         }
+    }
+
+    public int exportableByteSize() {
+        return 3 * 8;
+    }
+
+    public byte[] toExport() {
+        byte[] bytes = new byte[this.exportableByteSize()];
+
+        byte[] posXBytes = DataConversionHelper.doubleToByteArray(pos.x);
+        byte[] posYBytes = DataConversionHelper.doubleToByteArray(pos.y);
+        byte[] rotationBytes = DataConversionHelper.doubleToByteArray(rotation);
+
+        System.arraycopy(posXBytes, 0, bytes, 0, 8);
+        System.arraycopy(posYBytes, 0, bytes, 8, 8);
+        System.arraycopy(rotationBytes, 0, bytes, 16, 8);
+
+        return bytes;
     }
 }

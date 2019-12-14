@@ -112,6 +112,7 @@ public class UIController implements UpdateListener<Tools> {
         Group nodeHandles = getHandleGroup(Tools.MOVE_NODE);
         Group pathHandles = getHandleGroup(Tools.MOVE_PATH_CENTER);
         Group junctionHandles = getHandleGroup(Tools.MOVE_JUNCTION);
+        Group connectHandles = getHandleGroup(Tools.ADD_PATH);
 
         for (Node n : nodeHandles.getChildren()) {
             n.addEventHandler(MouseEvent.MOUSE_PRESSED, this::handleHandlePress);
@@ -124,6 +125,11 @@ public class UIController implements UpdateListener<Tools> {
             n.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::handleHandleDrag);
         }
         for (Node n : junctionHandles.getChildren()) {
+            n.addEventHandler(MouseEvent.MOUSE_PRESSED, this::handleHandlePress);
+            n.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleHandleRelease);
+            n.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::handleHandleDrag);
+        }
+        for (Node n : connectHandles.getChildren()) {
             n.addEventHandler(MouseEvent.MOUSE_PRESSED, this::handleHandlePress);
             n.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleHandleRelease);
             n.addEventHandler(MouseEvent.MOUSE_DRAGGED, this::handleHandleDrag);
@@ -312,6 +318,8 @@ public class UIController implements UpdateListener<Tools> {
 
         Position nodePos = getMapPosition(mouseEvent);
 
+        System.out.println("Click map pos: " + nodePos);
+
         switch (Editor.getInstance().activeTool.get()) {
             case ADD_NODE:
                 Editor.getInstance().map.get().addNode(new map.Node(nodePos));
@@ -324,8 +332,6 @@ public class UIController implements UpdateListener<Tools> {
             default:
                 return;
         }
-
-
     }
 
     private Position getMapPosition(MouseEvent mouseEvent) {
@@ -345,8 +351,6 @@ public class UIController implements UpdateListener<Tools> {
                 mapViewFeature.getHeight(),
                 mid,
                 scale);
-
-        System.out.println(nodePos);
 
         return nodePos;
     }

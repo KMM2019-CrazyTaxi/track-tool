@@ -39,6 +39,14 @@ public class Position {
         this.y /= k;
     }
 
+    public void rotate(double v) {
+        double x = (this.x * Math.cos(v) - this.y * Math.sin(v));
+        double y = (this.x * Math.sin(v) + this.y * Math.cos(v));
+
+        this.x = x;
+        this.y = y;
+    }
+
     @Override
     public String toString() {
         return "Position{" +

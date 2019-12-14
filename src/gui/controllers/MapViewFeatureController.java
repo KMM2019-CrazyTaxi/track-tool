@@ -3,9 +3,7 @@ package gui.controllers;
 import editor.Editor;
 import helpers.UpdateListener;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.QuadCurve;
@@ -88,8 +86,8 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             if (n.getNeighbors().size() < 2) {
                 // Add connect handle
                 Circle fxConnectHandleDot = new Circle(startPos.x, startPos.y, HANDLE_DOT_SIZE);
-                fxNodeHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
-                fxNodeHandleDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
+                fxConnectHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
+                fxConnectHandleDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
                 mapViewConnectHandles.getChildren().add(fxConnectHandleDot);
             }
 
@@ -119,9 +117,10 @@ public class MapViewFeatureController implements UpdateListener<Map> {
                 mapViewPathHandles.getChildren().add(fxPathHandleDot);
             }
         }
+
         for (Junction junc : map.getJunctions()) {
             // Get positions
-            Position posMid = repositionPoint(junc.getPos(), width, height, mapCenterMass, scaleFactor);
+            Position posMid = repositionPoint(junc.getPosition(), width, height, mapCenterMass, scaleFactor);
             Position pos1 = repositionPoint(junc.getBottomNode().getPosition(), width, height, mapCenterMass, scaleFactor);
             Position pos2 = repositionPoint(junc.getRightNode().getPosition(), width, height, mapCenterMass, scaleFactor);
             Position pos3 = repositionPoint(junc.getLeftNode().getPosition(), width, height, mapCenterMass, scaleFactor);
@@ -157,6 +156,35 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             mapViewPathLayer.getChildren().add(fxPathLine1);
             mapViewPathLayer.getChildren().add(fxPathLine2);
             mapViewPathLayer.getChildren().add(fxPathLine3);
+
+            for (Connection c : junc.getExternalNeighbors()) {
+                Node n1 = c.getNodes().getKey();
+                Node n2 = c.getNodes().getValue();
+
+                Position startPos = repositionPoint(n1.getPosition(), width, height, mapCenterMass, scaleFactor);
+                Position midPos = repositionPoint(c.getMidPoint(), width, height, mapCenterMass, scaleFactor);
+                Position endPos = repositionPoint(n2.getPosition(), width, height, mapCenterMass, scaleFactor);
+
+                // Add path
+                QuadCurve fxPathLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
+                fxPathLine.getStyleClass().add("mapPathLine");
+                mapViewPathLayer.getChildren().add(fxPathLine);
+
+                // Add distance text
+                Text distanceText = new Text(String.valueOf(c.getDistance()));
+                distanceText.getStyleClass().addAll("distanceText", "darkText");
+                double halfWidth = distanceText.getLayoutBounds().getWidth() / 2;
+                double halfHeight = distanceText.getLayoutBounds().getHeight() / 2;
+                distanceText.setX(midPos.x - halfWidth * 1.5);
+                distanceText.setY(midPos.y - halfHeight * 1.5);
+                mapViewPathLayer.getChildren().add(distanceText);
+
+                // Add path handle
+                Circle fxPathHandleDot = new Circle(midPos.x, midPos.y, HANDLE_DOT_SIZE);
+                fxPathHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
+                fxPathHandleDot.idProperty().setValue(n1.getIndex(map) + ":" + n2.getIndex(map));
+                mapViewPathHandles.getChildren().add(fxPathHandleDot);
+            }
 
             // Add connect handles
             if (junc.getBottomNode().getNeighbors().size() < 3) {
@@ -266,7 +294,23 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             }
         }
 
-        return width / (2 * (max - min));
+        for (Junction j : map.getJunctions()) {
+
+            Position juncPos = j.getPosition();
+
+            if (min > juncPos.x)
+                min = juncPos.x;
+
+            if (max < juncPos.x)
+                max = juncPos.x;
+        }
+
+        Double factor = width / (2 * (max - min));
+        factor = factor.isInfinite() || factor.isNaN() ? 1 : factor;
+
+        System.out.println("facX: " + factor);
+
+        return factor;
     }
 
     /**
@@ -301,7 +345,24 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             }
         }
 
-        return height / (2 * (max - min));
+        for (Junction j : map.getJunctions()) {
+
+            Position juncPos = j.getPosition();
+
+            if (min > juncPos.y)
+                min = juncPos.y;
+
+            if (max < juncPos.y)
+                max = juncPos.y;
+        }
+
+
+        Double factor = height / (2 * (max - min));
+        factor = factor.isInfinite() || factor.isNaN() ? 1 : factor;
+
+        System.out.println("facY: " + factor);
+
+        return factor;
     }
 
     /**
@@ -325,12 +386,15 @@ public class MapViewFeatureController implements UpdateListener<Map> {
         }
 
         for (Junction j : map.getJunctions()) {
-            offset.add(j.getPos());
+            offset.add(j.getPosition());
             numberOfPositions++;
         }
 
         // Divide by number of positions to get center of mass
         offset.divide(numberOfPositions);
+
+        if (((Double)offset.x).isNaN() ||((Double)offset.x).isInfinite() || ((Double)offset.y).isNaN() || ((Double)offset.y).isInfinite())
+            return new Position(0, 0);
 
         return offset;
     }

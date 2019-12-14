@@ -3,7 +3,6 @@ package map;
 import helpers.DataConversionHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Map {
@@ -13,6 +12,70 @@ public class Map {
     public Map() {
         nodes = new ArrayList<>();
         junctions = new ArrayList<>();
+    }
+
+    public Map(byte[] bytes) {
+        this();
+
+        int numberOfJunctions = DataConversionHelper.byteArrayToUnsignedInt(bytes, 0, 2);
+        int numberOfNodes = DataConversionHelper.byteArrayToUnsignedInt(bytes, 2, 2);
+        int numberOfConnections = DataConversionHelper.byteArrayToUnsignedInt(bytes, 4, 2);
+
+        int offset = 6;
+        
+        for (int i = 0; i < numberOfJunctions; i++) {
+
+            double x = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+            
+            double y = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+            
+            double rot = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+
+            Position pos = new Position(x, y);
+            Junction j = new Junction(pos, rot);
+            addJunction(j);
+        }
+        
+        for (int i = 0; i < numberOfNodes; i++) {
+            double x = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+            
+            double y = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+
+            Position pos = new Position(x, y);
+            Node n = new Node(pos);
+            addNode(n);
+        }
+        
+        for (int i = 0; i < numberOfConnections; i++) {
+            int fromIndex = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1);
+            offset += 1;
+            
+            int toIndex = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1);
+            offset += 1;
+            
+            int distance = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 2);
+            offset += 2;
+            
+            boolean stopable = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1) != 0;
+            offset += 1;
+            
+            Direction direction = Direction.fromByte(bytes[offset]);
+            offset += 1;
+            
+            double x = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+            
+            double y = DataConversionHelper.byteArrayToDouble(bytes, offset);
+            offset += 8;
+            
+            Connection c = new Connection(getNode(fromIndex), getNode(toIndex), direction, distance, stopable, new Position(x, y));
+            getNode(fromIndex).addNeighbor(c);
+        }
     }
 
     public void addNode(Node node) {
@@ -134,5 +197,109 @@ public class Map {
         }
 
         junctions.remove(junc);
+    }
+
+    public void addAll(List<Node> nodes) {
+        this.nodes.addAll(nodes);
+    }
+
+    public byte[] toExport() {
+        byte[] bytes = new byte[this.exportableByteSize()];
+        byte[] juncSizeBytes = DataConversionHelper.intToByteArray(junctions.size(), 2);
+        byte[] nodeSizeBytes = DataConversionHelper.intToByteArray(nodes.size(), 2);
+
+        bytes[0] = juncSizeBytes[0];
+        bytes[1] = juncSizeBytes[1];
+
+        bytes[2] = nodeSizeBytes[0];
+        bytes[3] = nodeSizeBytes[1];
+
+        int offset = 6;
+
+        for (Junction j : junctions) {
+            int juncSize = j.exportableByteSize();
+            System.arraycopy(j.toExport(), 0, bytes, offset, juncSize);
+            offset += juncSize;
+        }
+
+        for (Node n : nodes) {
+            int nodeSize = n.exportableByteSize();
+            System.arraycopy(n.toExport(), 0, bytes, offset, nodeSize);
+            offset += nodeSize;
+        }
+
+        int connections = 0;
+
+        for (Junction j : junctions) {
+            for (Connection c : j.getBottomNode().getNeighbors()) {
+                int conSize = c.exportableByteSize();
+
+                System.arraycopy(c.toExport(this, j.getBottomNode()), 0, bytes, offset, conSize);
+                offset += conSize;
+                connections++;
+            }
+
+            for (Connection c : j.getRightNode().getNeighbors()) {
+                int conSize = c.exportableByteSize();
+                System.arraycopy(c.toExport(this, j.getRightNode()), 0, bytes, offset, conSize);
+                offset += conSize;
+                connections++;
+            }
+
+            for (Connection c : j.getLeftNode().getNeighbors()) {
+                int conSize = c.exportableByteSize();
+                System.arraycopy(c.toExport(this, j.getLeftNode()), 0, bytes, offset, conSize);
+                offset += conSize;
+                connections++;
+            }
+        }
+
+        for (Node n : nodes) {
+            for (Connection c : n.getNeighbors()) {
+                int conSize = c.exportableByteSize();
+                System.arraycopy(c.toExport(this, n), 0, bytes, offset, conSize);
+                offset += conSize;
+                connections++;
+            }
+        }
+
+        byte[] connectionSizeBytes = DataConversionHelper.intToByteArray(connections, 2);
+
+        bytes[4] = connectionSizeBytes[0];
+        bytes[5] = connectionSizeBytes[1];
+
+        return bytes;
+    }
+
+    public int exportableByteSize() {
+        int sum = 6;
+        for (Junction j : junctions) {
+            sum += j.exportableByteSize();
+        }
+        for (Node n : nodes) {
+            sum += n.exportableByteSize();
+        }
+
+        for (Junction j : junctions) {
+            for (Connection c : j.getBottomNode().getNeighbors()) {
+                sum += c.exportableByteSize();
+            }
+
+            for (Connection c : j.getRightNode().getNeighbors()) {
+                sum += c.exportableByteSize();
+            }
+
+            for (Connection c : j.getLeftNode().getNeighbors()) {
+                sum += c.exportableByteSize();
+            }
+        }
+
+        for (Node n : nodes) {
+            for (Connection c : n.getNeighbors()) {
+                sum += c.exportableByteSize();
+            }
+        }
+
+        return sum;
     }
 }
