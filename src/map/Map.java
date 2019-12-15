@@ -61,9 +61,6 @@ public class Map {
             int distance = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 2);
             offset += 2;
 
-            boolean stopable = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1) != 0;
-            offset += 1;
-
             Direction direction = Direction.fromByte(bytes[offset]);
             offset += 1;
 
@@ -79,7 +76,7 @@ public class Map {
             Connection c = getConnection(fromNode, toNode);
 
             if (c == null) {
-                c = new Connection(getNode(fromIndex), getNode(toIndex), direction, distance, stopable, new Position(x, y));
+                c = new Connection(getNode(fromIndex), getNode(toIndex), direction, distance, new Position(x, y));
                 fromNode.addNeighbor(c);
                 toNode.addNeighbor(c);
             }

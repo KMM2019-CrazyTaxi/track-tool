@@ -71,7 +71,7 @@ public class MenuBarController {
             for (SplitNode neighbor : getSplitNeighbor(finalNodes, a.getNode())) {
                 if (neighbor.getJunctionID() == null || !neighbor.getJunctionID().equals(a.getJunctionID())) {
                     Connection con = a.getNode().getNeighbor(neighbor.getNode());
-                    Connection newCon = new Connection(b.getNode(), neighbor.getNode(), con.getDirection(), con.getDistance(), con.isStopable(), con.getMidPoint());
+                    Connection newCon = new Connection(b.getNode(), neighbor.getNode(), con.getDirection(), con.getDistance(), con.getMidPoint());
 
                     a.getNode().removeNeighbor(con);
                     b.getNode().addNeighbor(newCon);
@@ -82,7 +82,7 @@ public class MenuBarController {
                 }
                 else {
                     Connection con = neighbor.getSibling().getNeighbor(a.getNode());
-                    Connection newCon = new Connection(b.getNode(), neighbor.getSibling(), con.getDirection(), con.getDistance(), con.isStopable(), con.getMidPoint());
+                    Connection newCon = new Connection(b.getNode(), neighbor.getSibling(), con.getDirection(), con.getDistance(), con.getMidPoint());
 
                     neighbor.getSibling().removeNeighbor(con);
                     neighbor.getSibling().addNeighbor(newCon);
@@ -108,7 +108,7 @@ public class MenuBarController {
                             }
                         }
 
-                        Connection newCon = new Connection(sn.getNode(), sibNeighborSib, oldCon.getDirection().reverse(), oldCon.getDistance(), oldCon.isStopable(), oldCon.getMidPoint());
+                        Connection newCon = new Connection(sn.getNode(), sibNeighborSib, oldCon.getDirection().reverse(), oldCon.getDistance(), oldCon.getMidPoint());
 
                         removeCons.add(new Pair<>(sibNeighborSib, oldCon));
                         addCons.add(new Pair<>(sn.getNode(), newCon));

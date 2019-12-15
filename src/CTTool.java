@@ -28,13 +28,13 @@ public class CTTool extends Application {
 
         junc2.rotatePos(Math.PI);
 
-        Connection con1 = new Connection(node0, node1, Direction.STRAIGHT, 100, false, new Position(-100, 100));
-        Connection con2 = new Connection(node0, junc1.getLeftNode(), Direction.STRAIGHT, 100, false);
-        Connection con3 = new Connection(node1, junc2.getRightNode(), Direction.STRAIGHT, 100, false);
-        Connection con4 = new Connection(node2, node3, Direction.STRAIGHT, 100, false, new Position(400, 100));
-        Connection con5 = new Connection(node2, junc1.getRightNode(), Direction.STRAIGHT, 100, false);
-        Connection con6 = new Connection(node3, junc2.getLeftNode(), Direction.STRAIGHT, 100, false);
-        Connection con7 = new Connection(junc1.getBottomNode(), junc2.getBottomNode(), Direction.STRAIGHT, 100, false);
+        Connection con1 = new Connection(node0, node1, Direction.STRAIGHT, 100, new Position(-100, 100));
+        Connection con2 = new Connection(node0, junc1.getLeftNode(), Direction.STRAIGHT, 100);
+        Connection con3 = new Connection(node1, junc2.getRightNode(), Direction.STRAIGHT, 100);
+        Connection con4 = new Connection(node2, node3, Direction.STRAIGHT, 100, new Position(400, 100));
+        Connection con5 = new Connection(node2, junc1.getRightNode(), Direction.STRAIGHT, 100);
+        Connection con6 = new Connection(node3, junc2.getLeftNode(), Direction.STRAIGHT, 100);
+        Connection con7 = new Connection(junc1.getBottomNode(), junc2.getBottomNode(), Direction.STRAIGHT, 100);
 
         node0.addAllNeighbors(con1, con2);
         node1.addAllNeighbors(con1, con3);

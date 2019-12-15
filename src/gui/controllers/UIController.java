@@ -209,7 +209,7 @@ public class UIController implements UpdateListener<Tools> {
                 Editor.getInstance().markedNode.update(node);
             }
             else {
-                Connection newCon = new Connection(mark, node, Direction.STRAIGHT, 0, true);
+                Connection newCon = new Connection(mark, node, Direction.STRAIGHT, 0);
                 node.addNeighbor(newCon);
                 mark.addNeighbor(newCon);
                 Editor.getInstance().markedNode.update(null);
@@ -264,8 +264,8 @@ public class UIController implements UpdateListener<Tools> {
 
             map.Node newNode = new map.Node(con.getMidPoint());
 
-            Connection con1 = new Connection(node1, newNode, Direction.STRAIGHT, con.getDistance() / 2, true);
-            Connection con2 = new Connection(node2, newNode, Direction.STRAIGHT, con.getDistance() / 2, true);
+            Connection con1 = new Connection(node1, newNode, Direction.STRAIGHT, con.getDistance() / 2);
+            Connection con2 = new Connection(node2, newNode, Direction.STRAIGHT, con.getDistance() / 2);
 
             node1.addNeighbor(con1);
             node2.addNeighbor(con2);

@@ -22,14 +22,14 @@ public class Junction {
         rightNode = new Node(new Position());
         leftNode = new Node(new Position());
 
-        Connection botToRight = new Connection(bottomNode, rightNode, Direction.RIGHT, 0, false, pos);
-        Connection rightToBot = new Connection(bottomNode, rightNode, Direction.LEFT, 0, false, pos);
+        Connection botToRight = new Connection(bottomNode, rightNode, Direction.RIGHT, 0, pos);
+        Connection rightToBot = new Connection(bottomNode, rightNode, Direction.LEFT, 0, pos);
 
-        Connection rightToLeft = new Connection(leftNode, rightNode, Direction.STRAIGHT, 0, false, pos);
-        Connection leftToRight = new Connection(leftNode, rightNode, Direction.STRAIGHT, 0, false, pos);
+        Connection rightToLeft = new Connection(leftNode, rightNode, Direction.STRAIGHT, 0, pos);
+        Connection leftToRight = new Connection(leftNode, rightNode, Direction.STRAIGHT, 0, pos);
 
-        Connection leftToBot = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, false, pos);
-        Connection botToLeft = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, false, pos);
+        Connection leftToBot = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, pos);
+        Connection botToLeft = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, pos);
 
         bottomNode.addNeighbor(botToLeft);
         bottomNode.addNeighbor(botToRight);

@@ -7,22 +7,20 @@ public class Connection {
     // Byte size as per definition in connection protocol
     public final static int BYTE_SIZE = 5;
 
-    public static final int EXPORT_SIZE = 6 + 2 * 8;
+    public static final int EXPORT_SIZE = 5 + 2 * 8;
 
     private Node node1;
     private Node node2;
     private Direction direction;
     private int distance;
-    private boolean stopable;
 
     private Position midPoint;
 
-    public Connection(Node node1, Node node2, Direction direction, int distance, boolean stopable) {
+    public Connection(Node node1, Node node2, Direction direction, int distance) {
         this.node1 = node1;
         this.node2 = node2;
         this.direction = direction;
         this.distance = distance;
-        this.stopable = stopable;
 
         // Average the positions of connecting nodes
         Position avg = new Position(node1.getPosition());
@@ -32,12 +30,11 @@ public class Connection {
         this.midPoint = avg;
     }
 
-    public Connection(Node node1, Node node2, Direction direction, int distance, boolean stopable, Position midPoint) {
+    public Connection(Node node1, Node node2, Direction direction, int distance, Position midPoint) {
         this.node1 = node1;
         this.node2 = node2;
         this.direction = direction;
         this.distance = distance;
-        this.stopable = stopable;
         this.midPoint = midPoint;
     }
 
@@ -46,7 +43,6 @@ public class Connection {
         this.node2 = c.node2;
         this.direction = c.direction;
         this.distance = c.distance;
-        this.stopable = c.stopable;
         this.midPoint = c.midPoint;
     }
 
@@ -69,7 +65,7 @@ public class Connection {
     }
 
     public boolean isStopable() {
-        return stopable;
+        return direction == Direction.STRAIGHT;
     }
 
     public Position getMidPoint() {
@@ -82,7 +78,7 @@ public class Connection {
         bytes[0] = DataConversionHelper.intToByteArray(getConnectingNode(self).getIndex(map), 1)[0];
         bytes[1] = DataConversionHelper.intToByteArray(distance, 2)[0];
         bytes[2] = DataConversionHelper.intToByteArray(distance, 2)[1];
-        bytes[3] = (byte) (stopable ? 1 : 0);
+        bytes[3] = (byte) (isStopable() ? 1 : 0);
         bytes[4] = direction.code();
 
         return bytes;
@@ -107,14 +103,13 @@ public class Connection {
         bytes[1] = DataConversionHelper.intToByteArray(getConnectingNode(self).getIndex(map), 1)[0];
         bytes[2] = DataConversionHelper.intToByteArray(distance, 2)[0];
         bytes[3] = DataConversionHelper.intToByteArray(distance, 2)[1];
-        bytes[4] = (byte) (stopable ? 1 : 0);
-        bytes[5] = direction.code();
+        bytes[4] = direction.code();
 
         byte[] posXBytes = DataConversionHelper.doubleToByteArray(midPoint.x);
         byte[] posYBytes = DataConversionHelper.doubleToByteArray(midPoint.y);
 
-        System.arraycopy(posXBytes, 0, bytes, 6, 8);
-        System.arraycopy(posYBytes, 0, bytes, 14, 8);
+        System.arraycopy(posXBytes, 0, bytes, 5, 8);
+        System.arraycopy(posYBytes, 0, bytes, 13, 8);
 
         return bytes;
     }
