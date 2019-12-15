@@ -1,4 +1,5 @@
 import editor.Editor;
+import editor.Tools;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -12,6 +13,8 @@ public class CTTool extends Application {
     public void start(Stage stage) throws Exception {
         Stage root = FXMLLoader.load(getClass().getResource("gui/fxml/UI.fxml"));
         root.show();
+
+        Editor.getInstance().activeTool.update(Tools.NONE);
 
         // Map test
         Map map = new Map();
