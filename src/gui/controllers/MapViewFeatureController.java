@@ -20,9 +20,14 @@ public class MapViewFeatureController implements UpdateListener<Map> {
     private static final double HANDLE_DOT_SIZE = 10;
 
     @FXML private Pane mapViewFeature;
+
     @FXML private Group mapViewNodeLayer;
     @FXML private Group mapViewPathLayer;
     @FXML private Group mapViewJunctionLayer;
+
+    @FXML private Group mapViewNodeMarks;
+    @FXML private Group mapViewPathMarks;
+    @FXML private Group mapViewJunctionMarks;
 
     @FXML private Group mapViewNodeHandles;
     @FXML private Group mapViewPathHandles;
@@ -30,8 +35,98 @@ public class MapViewFeatureController implements UpdateListener<Map> {
 
     @FXML private Group mapViewConnectHandles;
 
+    private Node markedNode;
+    private Connection markedPath;
+    private Junction markedJunction;
+
     public void initialize() {
         Editor.getInstance().map.subscribe(this);
+
+        Editor.getInstance().markedNode.subscribe(o -> {
+            Map map = Editor.getInstance().map.get();
+
+            if (markedNode != null) {
+                Circle oldMark = (Circle) mapViewNodeMarks.lookup("#" + markedNode.getIndex(map));
+                oldMark.getStyleClass().remove("marked");
+            }
+
+            if (o != null) {
+                Circle mark = (Circle) mapViewNodeMarks.lookup("#" + o.getIndex(map));
+                mark.getStyleClass().add("marked");
+            }
+
+            markedNode = o;
+        });
+
+        Editor.getInstance().markedPath.subscribe(o -> {
+            Map map = Editor.getInstance().map.get();
+
+            if (markedPath != null) {
+                Node oldN1 = markedPath.getNodes().getKey();
+                Node oldN2 = markedPath.getNodes().getValue();
+
+                QuadCurve oldMark = (QuadCurve) mapViewPathMarks.lookup("#" + oldN1.getIndex(map) + "-" + oldN2.getIndex(map));
+                if (oldMark == null)
+                    oldMark = (QuadCurve) mapViewPathMarks.lookup("#" + oldN2.getIndex(map) + "-" + oldN1.getIndex(map));
+
+                oldMark.getStyleClass().remove("marked");
+            }
+
+            if (o != null) {
+                Node n1 = o.getNodes().getKey();
+                Node n2 = o.getNodes().getValue();
+
+                QuadCurve mark = (QuadCurve) mapViewPathMarks.lookup("#" + n1.getIndex(map) + "-" + n2.getIndex(map));
+                if (mark == null){
+                    System.out.println("WAS NULL");
+                    mark = (QuadCurve) mapViewPathMarks.lookup("#" + n2.getIndex(map) + "-" + n1.getIndex(map));
+                }
+
+                mark.getStyleClass().add("marked");
+            }
+
+            markedPath = o;
+        });
+
+        Editor.getInstance().markedJunction.subscribe(o -> {
+            Map map = Editor.getInstance().map.get();
+
+            if (markedJunction != null) {
+                Node oldN1 = markedJunction.getBottomNode();
+                Node oldN2 = markedJunction.getRightNode();
+                Node oldN3 = markedJunction.getLeftNode();
+
+                QuadCurve oldMark1 = (QuadCurve) mapViewJunctionMarks.lookup("#" + oldN1.getIndex(map) + "-" + oldN2.getIndex(map));
+                QuadCurve oldMark2 = (QuadCurve) mapViewJunctionMarks.lookup("#" + oldN2.getIndex(map) + "-" + oldN3.getIndex(map));
+                QuadCurve oldMark3 = (QuadCurve) mapViewJunctionMarks.lookup("#" + oldN1.getIndex(map) + "-" + oldN3.getIndex(map));
+
+                oldMark1.getStyleClass().remove("marked");
+                oldMark2.getStyleClass().remove("marked");
+                oldMark3.getStyleClass().remove("marked");
+            }
+
+            if (o != null) {
+                Node n1 = o.getBottomNode();
+                Node n2 = o.getRightNode();
+                Node n3 = o.getLeftNode();
+
+                QuadCurve mark1 = (QuadCurve) mapViewJunctionMarks.lookup("#" + n1.getIndex(map) + "-" + n2.getIndex(map));
+                QuadCurve mark2 = (QuadCurve) mapViewJunctionMarks.lookup("#" + n2.getIndex(map) + "-" + n3.getIndex(map));
+                QuadCurve mark3 = (QuadCurve) mapViewJunctionMarks.lookup("#" + n1.getIndex(map) + "-" + n3.getIndex(map));
+
+                mark1.getStyleClass().add("marked");
+                mark2.getStyleClass().add("marked");
+                mark3.getStyleClass().add("marked");
+            }
+
+            markedJunction = o;
+        });
+    }
+
+    private static void printAllNodes(Group group) {
+        for (javafx.scene.Node n : group.getChildren()) {
+            System.out.println(n.getId());
+        }
     }
 
     /**
@@ -39,10 +134,11 @@ public class MapViewFeatureController implements UpdateListener<Map> {
      * @param data New Map data.
      */
     public void update(Map data) {
+        markedPath = null;
+        markedJunction = null;
+        markedNode = null;
+
         redraw(data);
-        System.out.println("Redrew");
-        System.out.println(mapViewConnectHandles.getChildren().size() + " connect handles");
-        System.out.println(Editor.getInstance().map.get().getJunctions().size() + " junctions");
     }
 
     /**
@@ -53,6 +149,10 @@ public class MapViewFeatureController implements UpdateListener<Map> {
         mapViewNodeLayer.getChildren().clear();
         mapViewPathLayer.getChildren().clear();
         mapViewJunctionLayer.getChildren().clear();
+
+        mapViewNodeMarks.getChildren().clear();
+        mapViewPathMarks.getChildren().clear();
+        mapViewJunctionMarks.getChildren().clear();
 
         mapViewNodeHandles.getChildren().clear();
         mapViewPathHandles.getChildren().clear();
@@ -76,6 +176,12 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             fxNodeDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
             mapViewNodeLayer.getChildren().add(fxNodeDot);
 
+            // Add node mark
+            Circle fxNodeMarkDot = new Circle(startPos.x, startPos.y, NODE_DOT_SIZE);
+            fxNodeMarkDot.getStyleClass().addAll("mapNodeDot", "marker");
+            fxNodeMarkDot.idProperty().setValue(String.valueOf(n.getIndex(map)));
+            mapViewNodeMarks.getChildren().add(fxNodeMarkDot);
+
             // Add node handle
             Circle fxNodeHandleDot = new Circle(startPos.x, startPos.y, HANDLE_DOT_SIZE);
             fxNodeHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
@@ -98,8 +204,14 @@ public class MapViewFeatureController implements UpdateListener<Map> {
                 // Add path
                 QuadCurve fxPathLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
                 fxPathLine.getStyleClass().add("mapPathLine");
-                fxPathLine.idProperty().setValue("mapPathLine" + n.getIndex(map) + ":" + c.getConnectingNode(n).getIndex(map));
+                fxPathLine.idProperty().setValue(n.getIndex(map) + "-" + c.getConnectingNode(n).getIndex(map));
                 mapViewPathLayer.getChildren().add(fxPathLine);
+
+                // Add path mark
+                QuadCurve fxPathMarkLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
+                fxPathMarkLine.getStyleClass().addAll("mapPathLine", "marker");
+                fxPathMarkLine.idProperty().setValue(n.getIndex(map) + "-" + c.getConnectingNode(n).getIndex(map));
+                mapViewPathMarks.getChildren().add(fxPathMarkLine);
 
                 // Add distance text
                 Text distanceText = new Text(String.valueOf(c.getDistance()));
@@ -113,7 +225,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
                 // Add path handle
                 Circle fxPathHandleDot = new Circle(midPos.x, midPos.y, HANDLE_DOT_SIZE);
                 fxPathHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
-                fxPathHandleDot.idProperty().setValue(n.getIndex(map) + ":" + c.getConnectingNode(n).getIndex(map));
+                fxPathHandleDot.idProperty().setValue(n.getIndex(map) + "-" + c.getConnectingNode(n).getIndex(map));
                 mapViewPathHandles.getChildren().add(fxPathHandleDot);
             }
         }
@@ -144,6 +256,23 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             mapViewNodeLayer.getChildren().add(fxNodeDot2);
             mapViewNodeLayer.getChildren().add(fxNodeDot3);
 
+            // Add node marks
+            Circle fxNodeMarkDot1 = new Circle(pos1.x, pos1.y, NODE_DOT_SIZE);
+            Circle fxNodeMarkDot2 = new Circle(pos2.x, pos2.y, NODE_DOT_SIZE);
+            Circle fxNodeMarkDot3 = new Circle(pos3.x, pos3.y, NODE_DOT_SIZE);
+
+            fxNodeMarkDot1.getStyleClass().addAll("mapNodeDot", "marker");
+            fxNodeMarkDot2.getStyleClass().addAll("mapNodeDot", "marker");
+            fxNodeMarkDot3.getStyleClass().addAll("mapNodeDot", "marker");
+
+            fxNodeMarkDot1.setId(String.valueOf(junc.getBottomNode().getIndex(map)));
+            fxNodeMarkDot2.setId(String.valueOf(junc.getRightNode().getIndex(map)));
+            fxNodeMarkDot3.setId(String.valueOf(junc.getLeftNode().getIndex(map)));
+
+            mapViewNodeMarks.getChildren().add(fxNodeMarkDot1);
+            mapViewNodeMarks.getChildren().add(fxNodeMarkDot2);
+            mapViewNodeMarks.getChildren().add(fxNodeMarkDot3);
+
             // Add Paths
             QuadCurve fxPathLine1 = new QuadCurve(pos1.x, pos1.y, posMid.x, posMid.y, pos2.x, pos2.y);
             QuadCurve fxPathLine2 = new QuadCurve(pos2.x, pos2.y, posMid.x, posMid.y, pos3.x, pos3.y);
@@ -156,6 +285,23 @@ public class MapViewFeatureController implements UpdateListener<Map> {
             mapViewPathLayer.getChildren().add(fxPathLine1);
             mapViewPathLayer.getChildren().add(fxPathLine2);
             mapViewPathLayer.getChildren().add(fxPathLine3);
+
+            // Add path marks
+            QuadCurve fxPathMarkLine1 = new QuadCurve(pos1.x, pos1.y, posMid.x, posMid.y, pos2.x, pos2.y);
+            QuadCurve fxPathMarkLine2 = new QuadCurve(pos2.x, pos2.y, posMid.x, posMid.y, pos3.x, pos3.y);
+            QuadCurve fxPathMarkLine3 = new QuadCurve(pos3.x, pos3.y, posMid.x, posMid.y, pos1.x, pos1.y);
+
+            fxPathMarkLine1.getStyleClass().addAll("mapPathLine", "marker");
+            fxPathMarkLine2.getStyleClass().addAll("mapPathLine", "marker");
+            fxPathMarkLine3.getStyleClass().addAll("mapPathLine", "marker");
+
+            fxPathMarkLine1.setId(junc.getBottomNode().getIndex(map) + "-" + junc.getRightNode().getIndex(map));
+            fxPathMarkLine2.setId(junc.getRightNode().getIndex(map) + "-" + junc.getLeftNode().getIndex(map));
+            fxPathMarkLine3.setId(junc.getBottomNode().getIndex(map) + "-" + junc.getLeftNode().getIndex(map));
+
+            mapViewJunctionMarks.getChildren().add(fxPathMarkLine1);
+            mapViewJunctionMarks.getChildren().add(fxPathMarkLine2);
+            mapViewJunctionMarks.getChildren().add(fxPathMarkLine3);
 
             for (Connection c : junc.getExternalNeighbors()) {
                 Node n1 = c.getNodes().getKey();
@@ -170,6 +316,12 @@ public class MapViewFeatureController implements UpdateListener<Map> {
                 fxPathLine.getStyleClass().add("mapPathLine");
                 mapViewPathLayer.getChildren().add(fxPathLine);
 
+                // Add path mark
+                QuadCurve fxPathMarkLine = new QuadCurve(startPos.x, startPos.y, midPos.x, midPos.y, endPos.x, endPos.y);
+                fxPathMarkLine.getStyleClass().addAll("mapPathLine", "marker");
+                fxPathMarkLine.idProperty().setValue(n1.getIndex(map) + "-" + n2.getIndex(map));
+                mapViewPathMarks.getChildren().add(fxPathMarkLine);
+
                 // Add distance text
                 Text distanceText = new Text(String.valueOf(c.getDistance()));
                 distanceText.getStyleClass().addAll("distanceText", "darkText");
@@ -182,7 +334,7 @@ public class MapViewFeatureController implements UpdateListener<Map> {
                 // Add path handle
                 Circle fxPathHandleDot = new Circle(midPos.x, midPos.y, HANDLE_DOT_SIZE);
                 fxPathHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
-                fxPathHandleDot.idProperty().setValue(n1.getIndex(map) + ":" + n2.getIndex(map));
+                fxPathHandleDot.idProperty().setValue(n1.getIndex(map) + "-" + n2.getIndex(map));
                 mapViewPathHandles.getChildren().add(fxPathHandleDot);
             }
 
@@ -308,8 +460,6 @@ public class MapViewFeatureController implements UpdateListener<Map> {
         Double factor = width / (2 * (max - min));
         factor = factor.isInfinite() || factor.isNaN() ? 1 : factor;
 
-        System.out.println("facX: " + factor);
-
         return factor;
     }
 
@@ -359,8 +509,6 @@ public class MapViewFeatureController implements UpdateListener<Map> {
 
         Double factor = height / (2 * (max - min));
         factor = factor.isInfinite() || factor.isNaN() ? 1 : factor;
-
-        System.out.println("facY: " + factor);
 
         return factor;
     }

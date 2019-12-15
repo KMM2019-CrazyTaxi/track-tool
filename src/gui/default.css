@@ -345,6 +345,15 @@ Map view feature
     -fx-font-weight: bold;
 }
 
+.marker {
+    visibility: hidden;
+}
+
+.marked {
+    visibility: visible !important;
+    -fx-effect: innershadow(gaussian, -cc-accent-color, 10, 0, 0, 0);
+}
+
 /*
 Tool bar
 */

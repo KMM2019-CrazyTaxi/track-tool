@@ -57,24 +57,32 @@ public class Map {
             
             int toIndex = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1);
             offset += 1;
-            
+
             int distance = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 2);
             offset += 2;
-            
+
             boolean stopable = DataConversionHelper.byteArrayToUnsignedInt(bytes, offset, 1) != 0;
             offset += 1;
-            
+
             Direction direction = Direction.fromByte(bytes[offset]);
             offset += 1;
-            
+
             double x = DataConversionHelper.byteArrayToDouble(bytes, offset);
             offset += 8;
-            
+
             double y = DataConversionHelper.byteArrayToDouble(bytes, offset);
             offset += 8;
-            
-            Connection c = new Connection(getNode(fromIndex), getNode(toIndex), direction, distance, stopable, new Position(x, y));
-            getNode(fromIndex).addNeighbor(c);
+
+            Node fromNode = getNode(fromIndex);
+            Node toNode = getNode(toIndex);
+
+            Connection c = getConnection(fromNode, toNode);
+
+            if (c == null) {
+                c = new Connection(getNode(fromIndex), getNode(toIndex), direction, distance, stopable, new Position(x, y));
+                fromNode.addNeighbor(c);
+                toNode.addNeighbor(c);
+            }
         }
     }
 

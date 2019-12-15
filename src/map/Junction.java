@@ -189,4 +189,9 @@ public class Junction {
 
         return bytes;
     }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+        setPos(this.pos);
+    }
 }

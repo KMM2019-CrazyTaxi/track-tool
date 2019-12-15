@@ -175,7 +175,7 @@ public class UIController implements UpdateListener<Tools> {
             handleNodeToolPress(mouseEvent, handle, tool, node);
         }
         else if (tool.getType() == Tools.ToolType.PATH) {
-            String[] bits = handle.getId().split(":");
+            String[] bits = handle.getId().split("-");
 
             int id1 = Integer.parseInt(bits[0]);
             int id2 = Integer.parseInt(bits[1]);
@@ -225,6 +225,10 @@ public class UIController implements UpdateListener<Tools> {
         else if (tool == Tools.REMOVE_JUNCTION) {
             Editor.getInstance().map.get().removeJunction(junc);
             Editor.getInstance().map.noteChange();
+        }
+        else if (tool == Tools.ROTATE_JUNCTION) {
+            dragging.set(true);
+            Editor.getInstance().markedJunction.update(junc);
         }
     }
 
@@ -286,7 +290,9 @@ public class UIController implements UpdateListener<Tools> {
         if (dragging.get()) {
             dragGhost.setVisible(false);
 
-            Position newPos = getMapPosition(mouseEvent);
+            Position eventPos = new Position(dragGhost.getCenterX(), dragGhost.getCenterY());
+
+            Position newPos = getMapPosition(eventPos);
 
             if (tool == Tools.MOVE_NODE) {
                 Editor.getInstance().markedNode.get().setPosition(newPos);
@@ -296,6 +302,15 @@ public class UIController implements UpdateListener<Tools> {
             }
             else if (tool == Tools.MOVE_JUNCTION) {
                 Editor.getInstance().markedJunction.get().setPos(newPos);
+            }
+            else if (tool == Tools.ROTATE_JUNCTION) {
+                Junction junc = Editor.getInstance().markedJunction.get();
+
+                newPos.subtract(junc.getPosition());
+
+                double rotation = Math.atan2(newPos.x, -newPos.y);
+
+                junc.setRotation(rotation);
             }
 
             Editor.getInstance().map.noteChange();
@@ -318,8 +333,6 @@ public class UIController implements UpdateListener<Tools> {
 
         Position nodePos = getMapPosition(mouseEvent);
 
-        System.out.println("Click map pos: " + nodePos);
-
         switch (Editor.getInstance().activeTool.get()) {
             case ADD_NODE:
                 Editor.getInstance().map.get().addNode(new map.Node(nodePos));
@@ -335,6 +348,13 @@ public class UIController implements UpdateListener<Tools> {
     }
 
     private Position getMapPosition(MouseEvent mouseEvent) {
+        Position clickPosition = new Position(mouseEvent.getX(), mouseEvent.getY());
+        clickPosition.subtract(new Position(mapViewFeature.getLayoutX(), mapViewFeature.getLayoutY()));
+
+        return getMapPosition(clickPosition);
+    }
+
+    private Position getMapPosition(Position pos) {
         Position mid = MapViewFeatureController.calculateCenterMass(Editor.getInstance().map.get());
         double scale = MapViewFeatureController.calculateScaleFactor(
                 Editor.getInstance().map.get(),
@@ -342,11 +362,8 @@ public class UIController implements UpdateListener<Tools> {
                 mapViewFeature.getHeight(),
                 mid);
 
-        Position clickPosition = new Position(mouseEvent.getX(), mouseEvent.getY());
-        clickPosition.subtract(new Position(mapViewFeature.getLayoutX(), mapViewFeature.getLayoutY()));
-
         Position nodePos = MapViewFeatureController.unpositionPoint(
-                clickPosition,
+                pos,
                 mapViewFeature.getWidth(),
                 mapViewFeature.getHeight(),
                 mid,
@@ -390,5 +407,9 @@ public class UIController implements UpdateListener<Tools> {
         deactivateHandles(currentTool);
         activateHandles(data);
         currentTool = data;
+
+        Editor.getInstance().markedNode.update(null);
+        Editor.getInstance().markedJunction.update(null);
+        Editor.getInstance().markedPath.update(null);
     }
 }
