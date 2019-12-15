@@ -221,6 +221,8 @@ public class UIController implements UpdateListener<Tools> {
     private void handleJunctionToolPress(MouseEvent mouseEvent, Node handle, Tools tool, Junction junc) {
         if (tool == Tools.MOVE_JUNCTION) {
             dragging.set(true);
+            dragGhost.setCenterX(mouseEvent.getX());
+            dragGhost.setCenterY(mouseEvent.getY());
             Editor.getInstance().markedJunction.update(junc);
         }
         else if (tool == Tools.REMOVE_JUNCTION) {
@@ -229,6 +231,8 @@ public class UIController implements UpdateListener<Tools> {
         }
         else if (tool == Tools.ROTATE_JUNCTION) {
             dragging.set(true);
+            dragGhost.setCenterX(mouseEvent.getX());
+            dragGhost.setCenterY(mouseEvent.getY());
             Editor.getInstance().markedJunction.update(junc);
         }
     }
@@ -236,6 +240,8 @@ public class UIController implements UpdateListener<Tools> {
     private void handlePathToolPress(MouseEvent mouseEvent, Node handle, Tools tool, map.Node node1, map.Node node2, Connection con) {
         if (tool == Tools.MOVE_PATH_CENTER) {
             dragging.set(true);
+            dragGhost.setCenterX(mouseEvent.getX());
+            dragGhost.setCenterY(mouseEvent.getY());
             Editor.getInstance().markedPath.update(con);
         }
         else if (tool == Tools.REMOVE_PATH) {
@@ -275,6 +281,8 @@ public class UIController implements UpdateListener<Tools> {
     private void handleNodeToolPress(MouseEvent mouseEvent, Node handle, Tools tool, map.Node node) {
         if (tool == Tools.MOVE_NODE) {
             dragging.set(true);
+            dragGhost.setCenterX(mouseEvent.getX());
+            dragGhost.setCenterY(mouseEvent.getY());
             Editor.getInstance().markedNode.update(node);
         }
         else if (tool == Tools.REMOVE_NODE) {
