@@ -78,7 +78,6 @@ public class MapViewFeatureController implements UpdateListener<Map> {
 
                 QuadCurve mark = (QuadCurve) mapViewPathMarks.lookup("#" + n1.getIndex(map) + "-" + n2.getIndex(map));
                 if (mark == null){
-                    System.out.println("WAS NULL");
                     mark = (QuadCurve) mapViewPathMarks.lookup("#" + n2.getIndex(map) + "-" + n1.getIndex(map));
                 }
 
@@ -340,7 +339,6 @@ public class MapViewFeatureController implements UpdateListener<Map> {
 
             // Add connect handles
             if (junc.getBottomNode().getNeighbors().size() < 3) {
-                System.out.println("Adding handle for bottom");
                 Circle fxConnectHandleDot = new Circle(pos1.x, pos1.y, HANDLE_DOT_SIZE);
                 fxConnectHandleDot.getStyleClass().addAll("mapNodeDot", "mapHandle");
                 fxConnectHandleDot.idProperty().setValue(String.valueOf(junc.getBottomNode().getIndex(map)));

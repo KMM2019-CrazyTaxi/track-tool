@@ -371,3 +371,7 @@ Tool bar
     -fx-padding: 15px;
     -fx-background-insets: 5px;
 }
+
+.toolButton:selected {
+    -fx-effect: innershadow(gaussian, -cc-accent-color, 15, 0, 0, 0);
+}

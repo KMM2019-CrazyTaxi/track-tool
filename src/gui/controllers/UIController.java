@@ -3,6 +3,7 @@ package gui.controllers;
 import editor.Editor;
 import editor.Tools;
 import helpers.UpdateListener;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -406,10 +407,17 @@ public class UIController implements UpdateListener<Tools> {
     public void update(Tools data) {
         deactivateHandles(currentTool);
         activateHandles(data);
-        currentTool = data;
+
+        Button oldToolButton = (Button) toolBar.lookup("#" + currentTool.name());
+        oldToolButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
+
+        Button newToolButton = (Button) toolBar.lookup("#" + data.name());
+        newToolButton.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), true);
 
         Editor.getInstance().markedNode.update(null);
         Editor.getInstance().markedJunction.update(null);
         Editor.getInstance().markedPath.update(null);
+
+        currentTool = data;
     }
 }

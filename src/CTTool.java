@@ -13,8 +13,6 @@ public class CTTool extends Application {
         Stage root = FXMLLoader.load(getClass().getResource("gui/fxml/UI.fxml"));
         root.show();
 
-        Editor.getInstance().activeTool.subscribe(System.out::println);
-
         // Map test
         Map map = new Map();
         Node node0 = new Node(new Position(0, 0));
