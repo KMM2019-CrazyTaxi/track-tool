@@ -198,7 +198,7 @@ public class MenuBarController {
 
     public void handleLoadClick(ActionEvent actionEvent) {
         // Choose file
-        File file = fileChooser.showSaveDialog(null);
+        File file = fileChooser.showOpenDialog(null);
 
         if (file == null)
             return;
