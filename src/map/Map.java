@@ -176,7 +176,7 @@ public class Map {
     }
 
     public Junction getJunction(int index) {
-        if (index > nodes.size())
+        if (index > junctions.size())
             throw new IllegalArgumentException("Given index is out of range (" + index + ").");
         return junctions.get(index);
     }
