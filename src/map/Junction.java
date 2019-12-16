@@ -29,7 +29,7 @@ public class Junction {
         Connection leftToRight = new Connection(leftNode, rightNode, Direction.STRAIGHT, 0, pos);
 
         Connection leftToBot = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, pos);
-        Connection botToLeft = new Connection(leftNode, bottomNode, Direction.RIGHT, 0, pos);
+        Connection botToLeft = new Connection(leftNode, bottomNode, Direction.LEFT, 0, pos);
 
         bottomNode.addNeighbor(botToLeft);
         bottomNode.addNeighbor(botToRight);
