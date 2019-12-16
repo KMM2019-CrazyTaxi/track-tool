@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 public class UIController implements UpdateListener<Tools> {
 
+    private static final int DEFAULT_DISTANCE = 1;
     @FXML private Scene uiScene;
     @FXML private VBox toolBar;
     @FXML private Pane mapViewFeature;
@@ -209,7 +210,7 @@ public class UIController implements UpdateListener<Tools> {
                 Editor.getInstance().markedNode.update(node);
             }
             else {
-                Connection newCon = new Connection(mark, node, Direction.STRAIGHT, 0);
+                Connection newCon = new Connection(mark, node, Direction.STRAIGHT, DEFAULT_DISTANCE);
                 node.addNeighbor(newCon);
                 mark.addNeighbor(newCon);
                 Editor.getInstance().markedNode.update(null);
