@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Scene?>
+<?import javafx.stage.Stage?>
+<?import java.net.URL?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextInputDialog?>
+<?import javafx.scene.control.Menu?>
+<Stage title="CT Tool" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.controllers.UIController">
+    <fx:define>
+        <TextInputDialog title="Enter distance in cm" fx:id="pathDistanceDialog"/>
+    </fx:define>
+    <scene>
+        <Scene fx:id="uiScene" width="800">
+            <stylesheets>
+                <URL value="@../default.css" />
+            </stylesheets>
+            <VBox>
+                <fx:include source="Menu.fxml" />
+                <HBox>
+                    <VBox fx:id="toolBar">
+                        <!--Tools-->
+                        <Region VBox.vgrow="ALWAYS" />
+                    </VBox>
+                    <fx:include fx:id="mapViewFeature" source="features/MapViewFeature.fxml" />
+                </HBox>
+            </VBox>
+        </Scene>
+    </scene>
+</Stage>
